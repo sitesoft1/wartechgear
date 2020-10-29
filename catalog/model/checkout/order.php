@@ -277,7 +277,16 @@ catch(Exception $e){
 	
 	public function addOrderToOdoo($order_info){
         
-        $line_ids = array();
+        $order_simple_fields = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_simple_fields WHERE order_id = '" . (int)$order_info['order_id'] . "'");
+	    if($order_simple_fields){
+            $payment_field23 = $order_simple_fields->row['payment_field23'];
+            $field21 = $order_simple_fields->row['field21'];
+        }else{
+            $payment_field23 = '';
+            $field21 = '';
+        }
+        
+	    $line_ids = array();
         $order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_info['order_id'] . "'");
         foreach ($order_product_query->rows as $order_product) {
             $line_ids[] = array(
@@ -294,7 +303,7 @@ catch(Exception $e){
             'date_added' => $order_info['date_added'],
             'date_modified' => $order_info['date_modified'],
             'line_ids' => $line_ids,
-            'firstname' => $order_info['firstname'],
+            'firstname' => $order_info['firstname'].' '.$payment_field23,
             'lastname' => $order_info['lastname'],
             'email' => $order_info['email'],
             'phone' => $order_info['telephone'],
@@ -302,7 +311,7 @@ catch(Exception $e){
             'payment_lastname' => $order_info['payment_lastname'],
             'payment_company' => '',
             'payment_address_1' => $order_info['payment_address_1'],
-            'payment_address_2' => $order_info['payment_address_1'],
+            'payment_address_2' => $field21,
             'payment_city' => $order_info['payment_city'],
             'payment_postcode' => $order_info['payment_postcode'],
             'payment_country' => $order_info['payment_country'],
@@ -325,7 +334,7 @@ catch(Exception $e){
             'shipping_zone' => $order_info['shipping_zone'],
             'shipping_zone_id' => $order_info['shipping_zone_id'],
             'shipping_address_format' => $order_info['shipping_address_format'],
-            'shipping_custom_fields' => $order_info['shipping_custom_field'],
+            'shipping_custom_fields' => $order_info['shipping_custom_field'].' '.$field21,
             'shipping_method' => $order_info['shipping_method'],
             'shipping_code' => $order_info['shipping_code'],
             'comment' => $order_info['comment']
@@ -345,12 +354,9 @@ catch(Exception $e){
 		    
 		    if($override===false){//Заказ добавлен из фронта
                 $this->addOrderToOdoo($order_info);
-		        file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
-                file_put_contents(DIR_LOGS.'order_status_id_log.txt',var_export($order_status_id, true));
-                file_put_contents(DIR_LOGS.'notify_log.txt',var_export($notify, true));
-                file_put_contents(DIR_LOGS.'override_log.txt',var_export($override, true));
+                file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
             }else{//Исторя изменена из админки
-                file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
+                //file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
             }
 		    
 		    
@@ -767,7 +773,7 @@ catch(Exception $e){
 				$mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
 				$mail->setHtml($this->load->view('mail/order', $data));
 				$mail->setText($text);
-				//$mail->send();
+				$mail->send();
 
 				// Admin Alert Mail
 				if (in_array('order', (array)$this->config->get('config_mail_alert'))) {
@@ -855,7 +861,7 @@ catch(Exception $e){
 					$mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
 					$mail->setHtml($this->load->view('mail/order', $data));
 					$mail->setText($text);
-					//$mail->send();
+					$mail->send();
 
 					// Send to additional alert emails
 					$emails = explode(',', $this->config->get('config_alert_email'));
@@ -882,7 +888,7 @@ catch(Exception $e){
 					);
 
 					$sms = new Sms($this->config->get('config_sms_gatename'), $options);
-					//$sms->send();
+					$sms->send();
 				}
 			}
 
@@ -930,7 +936,7 @@ catch(Exception $e){
                     $mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
                     $mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
                     $mail->setText($message);
-                    //$mail->send();
+                    $mail->send();
                 }
 			}
 		}
