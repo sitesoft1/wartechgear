@@ -335,7 +335,7 @@ catch(Exception $e){
         
         $result = $this->wcCurl($queryData, $queryUrl);
         
-        //$this->wcLog('odoo_result_log', $result, false);
+        $this->wcLog('odoo_result_log', $result, false);
     }
 
 	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false) {
@@ -345,12 +345,12 @@ catch(Exception $e){
 		    
 		    if($override===false){//Заказ добавлен из фронта
                 $this->addOrderToOdoo($order_info);
-		        //file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
-                // file_put_contents(DIR_LOGS.'order_status_id_log.txt',var_export($order_status_id, true));
-                //file_put_contents(DIR_LOGS.'notify_log.txt',var_export($notify, true));
-                //file_put_contents(DIR_LOGS.'override_log.txt',var_export($override, true));
+		        file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
+                file_put_contents(DIR_LOGS.'order_status_id_log.txt',var_export($order_status_id, true));
+                file_put_contents(DIR_LOGS.'notify_log.txt',var_export($notify, true));
+                file_put_contents(DIR_LOGS.'override_log.txt',var_export($override, true));
             }else{//Исторя изменена из админки
-                //file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
+                file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
             }
 		    
 		    
