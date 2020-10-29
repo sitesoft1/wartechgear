@@ -277,7 +277,7 @@ catch(Exception $e){
 	
 	public function addOrderToOdoo($order_info){
         
-        $order_simple_fields = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_simple_fields WHERE order_id = '" . (int)$order_info['order_id'] . "'");
+        $order_simple_fields = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_simple_fields WHERE order_id = '" . (int)$order_info['order_id'] . "' LIMIT 1");
 	    if($order_simple_fields){
             $payment_field23 = $order_simple_fields->row['payment_field23'];
             $field21 = $order_simple_fields->row['field21'];
@@ -295,8 +295,8 @@ catch(Exception $e){
                 'price_unit' => $order_product['price'],
             );
         }
-	    
-	    $queryData = array(
+        
+        $queryData = array(
             'order_id' => $order_info['order_id'],
             'customer_id' => $order_info['customer_id'],
             'date_order' => $order_info['date_added'],
@@ -307,9 +307,9 @@ catch(Exception $e){
             'lastname' => $order_info['lastname'],
             'email' => $order_info['email'],
             'phone' => $order_info['telephone'],
-            'payment_firstname' => $order_info['payment_firstname'],
+            'payment_firstname' => $order_info['payment_firstname'].' '.$payment_field23,
             'payment_lastname' => $order_info['payment_lastname'],
-            'payment_company' => '',
+            'payment_company' => $order_info['payment_method'],
             'payment_address_1' => $order_info['payment_address_1'],
             'payment_address_2' => $field21,
             'payment_city' => $order_info['payment_city'],
@@ -322,11 +322,11 @@ catch(Exception $e){
             'payment_custom_fields' => $order_info['payment_custom_field'],
             'payment_method' => $order_info['payment_method'],
             'payment_code' => $order_info['payment_code'],
-            'shipping_firstname' => $order_info['shipping_firstname'],
+            'shipping_firstname' => $order_info['shipping_firstname'].' '.$payment_field23,
             'shipping_lastname' => $order_info['shipping_lastname'],
             'shipping_company' => $order_info['shipping_method'],
             'shipping_address_1' => $order_info['shipping_address_1'],
-            'shipping_address_2' => $order_info['shipping_address_1'],
+            'shipping_address_2' => $field21,
             'shipping_city' => $order_info['shipping_city'],
             'shipping_postcode' => $order_info['shipping_postcode'],
             'shipping_country' => $order_info['shipping_country'],
@@ -340,11 +340,13 @@ catch(Exception $e){
             'comment' => $order_info['comment']
         );
         
+        //$this->wcLog('querydata_result_log', $queryData, false);
+        
         $queryUrl = 'https://wtsandbox.cetmix.com/api/v1/order';
         
         $result = $this->wcCurl($queryData, $queryUrl);
         
-        $this->wcLog('odoo_result_log', $result, false);
+        //$this->wcLog('odoo_result_log', $result, false);
     }
 
 	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false) {
@@ -354,7 +356,7 @@ catch(Exception $e){
 		    
 		    if($override===false){//Заказ добавлен из фронта
                 $this->addOrderToOdoo($order_info);
-                file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
+                //file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
             }else{//Исторя изменена из админки
                 //file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
             }
