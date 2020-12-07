@@ -357,7 +357,7 @@ catch(Exception $e){
 		    if($override===false){//Заказ добавлен из фронта
                 $this->addOrderToOdoo($order_info);
                 //file_put_contents(DIR_LOGS.'order_info_log.txt',var_export($order_info, true));
-            }else{//Исторя изменена из админки
+            }else{//Исторя изменена из админки.
                 //file_put_contents(DIR_LOGS.'order_info_admin_log.txt',var_export($order_info, true));
             }
 		    
